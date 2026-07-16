@@ -1,0 +1,36 @@
+# Build Rust
+/target/
+**/*.rs.bk
+*.pdb
+
+# Distribution assemblée (scripts/prepare-release.ps1)
+/dist/
+
+# Données runtime / utilisateur (créées au lancement)
+/soundboard.db
+/soundboard.db-*
+/temp/
+/logs/
+
+# Sons et images importés — garder uniquement les .gitkeep
+/assets/sounds/*
+!/assets/sounds/.gitkeep
+/assets/images/*
+!/assets/images/.gitkeep
+
+# Binaires tiers (trop volumineux) — voir tools/README.md
+/tools/ffmpeg/*
+!/tools/ffmpeg/.gitkeep
+/tools/yt-dlp/*
+!/tools/yt-dlp/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE / éditeurs
+.idea/
+.vscode/
+*.swp
+*~

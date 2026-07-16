@@ -1,0 +1,86 @@
+import { Theme } from "theme.slint";
+
+
+
+export component LibraryRow inherits Rectangle {
+
+    in property <string> title;
+
+    in property <bool> selected: false;
+
+    in property <string> leading-icon: "♪";
+
+    callback clicked;
+
+
+
+    height: 24px;
+
+    background: selected ? #2ecc7122 : transparent;
+
+
+
+    if root.leading-icon != "": Text {
+
+        text: root.leading-icon;
+
+        color: Theme.accent;
+
+        font-size: 11px;
+
+        x: 8px;
+
+        y: (parent.height - self.height) / 2;
+
+    }
+
+
+
+    Text {
+
+        text: root.title;
+
+        color: selected ? white : #bbbbbb;
+
+        font-size: 10px;
+
+        font-weight: selected ? 600 : 400;
+
+        x: root.leading-icon != "" ? 32px : 8px;
+
+        width: root.leading-icon != "" ? parent.width - 40px : parent.width - 16px;
+
+        y: (parent.height - self.height) / 2;
+
+        horizontal-alignment: left;
+
+    }
+
+
+
+    Rectangle {
+
+        y: parent.height - 1px;
+
+        height: 1px;
+
+        width: parent.width;
+
+        background: #3a3a3a;
+
+    }
+
+
+
+    touch := TouchArea {
+
+        width: 100%;
+
+        height: 100%;
+
+        clicked => { root.clicked(); }
+
+    }
+
+}
+

@@ -1,0 +1,95 @@
+import { Theme } from "theme.slint";
+
+// Boutons de pied de modale : forme et emplacement uniformes.
+// Disposition standard : … [Supprimer] [Fermer] alignés à droite.
+
+export component ModalBtn inherits Rectangle {
+    in property <string> label: "";
+    in property <brush> bg: Theme.btn;
+    callback pressed;
+
+    min-width: 88px;
+    height: 44px;
+    background: touch.has-hover ? Theme.btn-hover : bg;
+    border-radius: 10px;
+    border-width: 1px;
+    border-color: Theme.key-border;
+
+    Text {
+        text: root.label;
+        color: Theme.text;
+        font-size: 9px;
+        font-weight: 700;
+        width: parent.width;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+    }
+
+    touch := TouchArea {
+        width: 100%;
+        height: 100%;
+        clicked => { root.pressed(); }
+    }
+}
+
+export component ModalCloseBtn inherits ModalBtn {
+    label: @tr("Close");
+    bg: #333;
+}
+
+export component ModalDeleteBtn inherits ModalBtn {
+    label: @tr("Delete");
+    bg: Theme.danger;
+}
+
+export component ModalFooterClose inherits Rectangle {
+    callback close();
+
+    height: 44px;
+
+    HorizontalLayout {
+        alignment: end;
+        spacing: Theme.key-gap;
+        ModalCloseBtn {
+            pressed => { root.close(); }
+        }
+    }
+}
+
+export component ModalFooterDeleteClose inherits Rectangle {
+    callback close();
+    callback delete();
+
+    height: 44px;
+
+    HorizontalLayout {
+        alignment: end;
+        spacing: Theme.key-gap;
+        ModalDeleteBtn {
+            pressed => { root.delete(); }
+        }
+        ModalCloseBtn {
+            pressed => { root.close(); }
+        }
+    }
+}
+
+export component ModalFooterSaveClose inherits Rectangle {
+    callback save();
+    callback close();
+
+    height: 44px;
+
+    HorizontalLayout {
+        alignment: end;
+        spacing: Theme.key-gap;
+        ModalBtn {
+            label: @tr("Save");
+            bg: Theme.accent;
+            pressed => { root.save(); }
+        }
+        ModalCloseBtn {
+            pressed => { root.close(); }
+        }
+    }
+}

@@ -1,0 +1,32 @@
+; Exemple Inno Setup — à adapter puis compiler avec Inno Setup 6.
+; Prérequis : exécuter prepare-release.ps1 pour remplir dist\Streamdeck\
+
+#define MyAppName "Streamdeck"
+#define MyAppVersion "0.1.0"
+#define MyAppPublisher "Votre nom"
+#define MyAppExeName "sd-rs.exe"
+
+[Setup]
+AppId={{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}
+AppName={#MyAppName}
+AppVersion={#MyAppVersion}
+DefaultDirName={autopf}\{#MyAppName}
+DefaultGroupName={#MyAppName}
+OutputDir=..\dist
+OutputBaseFilename=Streamdeck-Setup
+Compression=lzma2
+SolidCompression=yes
+PrivilegesRequired=lowest
+
+[Files]
+Source: "..\dist\Streamdeck\*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs
+
+[Icons]
+Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+
+[Tasks]
+Name: "desktopicon"; Description: "Raccourci sur le bureau"; GroupDescription: "Raccourcis:"
+
+[Run]
+Filename: "{app}\{#MyAppExeName}"; Description: "Lancer {#MyAppName}"; Flags: nowait postinstall skipifsilent

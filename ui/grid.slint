@@ -1,0 +1,154 @@
+import { Theme } from "theme.slint";
+
+export struct SlotViewModel {
+    row: int,
+    col: int,
+    label: string,
+    kind: string,
+    kind-icon: string,
+    bg-color: brush,
+    is-system: bool,
+    use-slot-photo: bool,
+    slot-photo: image,
+    show-slot-icon: bool,
+    slot-icon: image,
+    alarm-armed: bool,
+    shortcut-label: string,
+}
+
+export component SoundButton inherits Rectangle {
+    in property <string> label;
+    in property <string> icon: "";
+    in property <string> kind-type: "";
+    in property <brush> bg-color: Theme.btn;
+    in property <bool> use-slot-photo: false;
+    in property <image> slot-photo;
+    in property <bool> show-slot-icon: false;
+    in property <image> slot-icon;
+    in property <bool> alarm-armed: false;
+    in property <string> shortcut-label: "";
+    callback clicked;
+
+    private property <bool> has-label: root.label != "";
+    private property <length> sys-icon-size: 34px;
+    private property <length> slot-icon-size: 30px;
+
+    width: 100%;
+    height: 100%;
+    background: touch.has-hover && !root.use-slot-photo ? Theme.btn-hover : bg-color;
+    border-radius: Theme.key-radius;
+    border-width: root.alarm-armed ? 3px : 1.5px;
+    border-color: root.alarm-armed ? #00c853 : Theme.key-border;
+    clip: true;
+
+    if root.kind-type == "home": Image {
+        source: @image-url("icons/maison.svg");
+        width: sys-icon-size;
+        height: sys-icon-size;
+        x: (parent.width - self.width) / 2;
+        y: (parent.height - self.height) / 2;
+    }
+
+    if root.kind-type == "back": Image {
+        source: @image-url("icons/annuler.svg");
+        width: sys-icon-size;
+        height: sys-icon-size;
+        x: (parent.width - self.width) / 2;
+        y: (parent.height - self.height) / 2;
+    }
+
+    if root.kind-type != "home" && root.kind-type != "back" && root.use-slot-photo: Image {
+        source: root.slot-photo;
+        width: parent.width;
+        height: parent.height;
+        image-fit: cover;
+    }
+
+    if root.kind-type != "home" && root.kind-type != "back" && !root.use-slot-photo && root.show-slot-icon: Image {
+        source: root.slot-icon;
+        width: slot-icon-size;
+        height: slot-icon-size;
+        x: (parent.width - self.width) / 2;
+        y: has-label ? (parent.height - slot-icon-size - 14px) / 2 : (parent.height - self.height) / 2;
+    }
+
+    if root.kind-type != "home" && root.kind-type != "back" && !root.use-slot-photo && !root.show-slot-icon && icon != "": Text {
+        text: icon;
+        font-size: 20px;
+        width: parent.width;
+        horizontal-alignment: center;
+        y: has-label ? (parent.height - 30px) / 2 : (parent.height - 20px) / 2;
+    }
+
+    if root.kind-type != "home" && root.kind-type != "back" && has-label: Rectangle {
+        width: parent.width;
+        height: 16px;
+        y: parent.height - self.height;
+        background: root.use-slot-photo ? #000000aa : transparent;
+        Text {
+            text: label;
+            color: Theme.text;
+            font-size: 9px;
+            font-weight: 700;
+            width: parent.width;
+            horizontal-alignment: center;
+            vertical-alignment: center;
+            wrap: word-wrap;
+        }
+    }
+
+    if root.shortcut-label != "": Rectangle {
+        width: 16px;
+        height: 14px;
+        x: parent.width - self.width - 3px;
+        y: parent.height - self.height - 3px;
+        background: #00000088;
+        border-radius: 3px;
+        Text {
+            text: root.shortcut-label;
+            color: #ccc;
+            font-size: 7px;
+            font-weight: 700;
+            horizontal-alignment: center;
+            vertical-alignment: center;
+        }
+    }
+
+    touch := TouchArea {
+        width: 100%;
+        height: 100%;
+        clicked => { root.clicked(); }
+    }
+}
+
+export component Grid5x3 inherits Rectangle {
+    in property <[SlotViewModel]> slots;
+    callback slot-clicked(int, int);
+
+    VerticalLayout {
+        spacing: Theme.key-gap;
+        alignment: center;
+        for r in 3: HorizontalLayout {
+            spacing: Theme.key-gap;
+            alignment: center;
+            for c in 5: Rectangle {
+                width: Theme.key-size;
+                height: Theme.key-size;
+                property <SlotViewModel> slot: root.slots[r * 5 + c];
+                SoundButton {
+                    label: slot.label;
+                    icon: slot.kind-icon;
+                    kind-type: slot.kind;
+                    bg-color: slot.bg-color;
+                    use-slot-photo: slot.use-slot-photo;
+                    slot-photo: slot.slot-photo;
+                    show-slot-icon: slot.show-slot-icon;
+                    slot-icon: slot.slot-icon;
+                    alarm-armed: slot.alarm-armed;
+                    shortcut-label: slot.shortcut-label;
+                    clicked => { root.slot-clicked(slot.row, slot.col); }
+                }
+            }
+        }
+    }
+}

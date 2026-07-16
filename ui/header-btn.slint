@@ -1,0 +1,104 @@
+import { Theme } from "theme.slint";
+
+
+
+export component HeaderBtn inherits Rectangle {
+
+    in property <string> title: "";
+
+    in property <string> icon-text: "";
+
+    in property <bool> use-image-icon: false;
+
+    in property <bool> active: false;
+
+    in property <image> icon-source;
+
+    in property <brush> key-color: Theme.tools;
+
+    callback activated;
+
+
+
+    private property <brush> fill: root.active ? Theme.accent : root.key-color;
+
+
+
+    width: Theme.header-btn-size;
+
+    height: Theme.header-btn-size;
+
+    background: touch.has-hover ? (root.active ? #3dd87d : Theme.btn-hover) : fill;
+
+    border-radius: 10px;
+
+    border-width: root.active ? 2px : 1px;
+
+    border-color: root.active ? #ffffff : Theme.key-border;
+
+
+
+    if root.use-image-icon: Image {
+
+        source: root.icon-source;
+
+        width: 22px;
+
+        height: 22px;
+
+        x: (parent.width - self.width) / 2;
+
+        y: (parent.height - self.height) / 2;
+
+    }
+
+
+
+    if !root.use-image-icon && root.icon-text != "": Text {
+
+        text: root.icon-text;
+
+        font-size: 16px;
+
+        width: parent.width;
+
+        horizontal-alignment: center;
+
+        y: root.title != "" ? 4px : (parent.height - 16px) / 2;
+
+    }
+
+
+
+    if root.title != "": Text {
+
+        text: root.title;
+
+        color: Theme.text;
+
+        font-size: 7px;
+
+        font-weight: 700;
+
+        width: parent.width;
+
+        horizontal-alignment: center;
+
+        y: parent.height - 12px;
+
+    }
+
+
+
+    touch := TouchArea {
+
+        width: 100%;
+
+        height: 100%;
+
+        clicked => { root.activated(); }
+
+    }
+
+}
+

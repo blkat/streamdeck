@@ -1,0 +1,1632 @@
+import { Theme } from "theme.slint";
+import { Grid5x3, SlotViewModel } from "grid.slint";
+import { DeckKey } from "deck-key.slint";
+import { HeaderBtn } from "header-btn.slint";
+import { LibraryRow } from "library-row.slint";
+import { ImageLibraryRow } from "image-library-row.slint";
+import { ClipTimeline } from "clip-timeline.slint";
+import { IconPickBtn } from "icon-pick-btn.slint";
+import { AppTopBar } from "window-chrome.slint";
+import { ActionBtn } from "action-btn.slint";
+import { ModalBtn, ModalCloseBtn, ModalDeleteBtn, ModalFooterClose, ModalFooterSaveClose } from "modal-footer.slint";
+import { Button, Slider, LineEdit, ComboBox, ListView, ScrollView, CheckBox } from "std-widgets.slint";
+
+export component AppWindow inherits Window {
+    title: "Streamdeck";
+    preferred-width: 520px;
+    preferred-height: 362px;
+    min-width: 480px;
+    min-height: 362px;
+    no-frame: true;
+    resize-border-width: 4px;
+    background: Theme.bg;
+    in-out property <bool> window-always-on-top: false;
+    always-on-top: root.window-always-on-top;
+
+    in-out property <[SlotViewModel]> grid-slots;
+    in-out property <float> global-volume: 0.7;
+    in-out property <bool> edit-mode: false;
+    in-out property <string> status-text: "";
+    in-out property <string> page-path: "/accueil";
+    in-out property <bool> show-library: false;
+    in-out property <bool> library-pick-mode: false;
+    in-out property <bool> show-image-library: false;
+    in-out property <bool> image-library-pick-mode: false;
+    in-out property <[string]> image-library-titles;
+    in-out property <int> image-library-selected: -1;
+    in-out property <string> image-library-url: "";
+    in-out property <string> image-library-name: "";
+    in-out property <image> image-library-thumb;
+    in-out property <bool> show-settings: false;
+    in-out property <bool> show-app-settings: false;
+    in-out property <bool> show-capture: false;
+    in-out property <bool> show-clip-editor: false;
+    in-out property <bool> show-url-clip: false;
+    in-out property <bool> show-tools-menu: false;
+    in-out property <bool> show-slot-editor: false;
+
+    in-out property <[string]> library-titles;
+    in-out property <int> library-selected: -1;
+
+    in-out property <string> capture-state: "idle";
+    in-out property <string> capture-timer: "00:00";
+    in-out property <string> capture-duration-label: @tr("Duration: —");
+    in-out property <string> capture-title: "";
+    in-out property <float> capture-level: 0.0;
+    in-out property <bool> capture-can-save: false;
+
+    in-out property <string> clip-source-path: "";
+    in-out property <string> clip-title: "";
+    in-out property <float> clip-range-start: 0;
+    in-out property <float> clip-range-end: 1;
+    in-out property <float> clip-duration-secs: 0;
+    in-out property <string> clip-start-label: "0.0s";
+    in-out property <string> clip-end-label: "0.0s";
+    in-out property <[float]> clip-waveform;
+    in-out property <string> clip-status-msg: "";
+
+    in-out property <string> url-input: "";
+    in-out property <string> url-title: "";
+    in-out property <float> url-duration-secs: 0;
+    in-out property <float> url-range-start: 0;
+    in-out property <float> url-range-end: 1;
+    in-out property <string> url-start-label: "0.0s";
+    in-out property <string> url-end-label: "0.0s";
+    in-out property <[float]> url-waveform;
+    in-out property <bool> url-bypass-limit: false;
+    in-out property <bool> url-loading: false;
+    in-out property <string> url-status-msg: "";
+
+    in-out property <string> settings-policy: "stop_previous";
+    in-out property <string> settings-max-channels: "3";
+    in-out property <string> settings-lufs: "-16";
+    in-out property <string> settings-capture-max-s: "60";
+    in-out property <string> settings-shell-powershell: "";
+    in-out property <string> settings-shell-cmd: "";
+    in-out property <string> settings-shell-bash: "";
+    in-out property <string> settings-shell-python: "";
+    in-out property <bool> settings-always-on-top: false;
+    in-out property <bool> settings-grid-shortcuts-enabled: true;
+    in-out property <string> settings-language: "en";
+    in-out property <string> capture-device-hint: "";
+    in-out property <string> capture-source: "microphone";
+    in-out property <bool> capture-loopback-available: false;
+
+    in-out property <string> slot-editor-label: "";
+    in-out property <string> slot-editor-shortcut-label: "A";
+    in-out property <bool> slot-editor-shortcut-capturing: false;
+    in-out property <string> slot-editor-shortcut-error: "";
+    in-out property <string> slot-editor-kind: "empty";
+    in-out property <string> slot-editor-sound-title: "";
+    in-out property <string> slot-editor-color: "#ff9800";
+    in-out property <string> slot-editor-script: "";
+    in-out property <string> slot-editor-script-shell: "powershell";
+    in-out property <string> slot-editor-icon: "aide";
+    in-out property <string> slot-editor-appearance: "color";
+    in-out property <string> slot-editor-image-url: "";
+    in-out property <image> slot-editor-photo-preview;
+    in-out property <string> slot-editor-alarm-time: "12:00";
+    in-out property <string> slot-editor-alarm-mode: "clock";
+    in-out property <int> slot-editor-alarm-hour-index: 12;
+    in-out property <int> slot-editor-alarm-minute-index: 0;
+    in-out property <int> slot-editor-alarm-minutes: 10;
+    in-out property <string> slot-editor-alarm-minutes-text: "10";
+    in-out property <[string]> slot-editor-hour-options;
+    in-out property <[string]> slot-editor-minute-options;
+    in-out property <brush> slot-editor-color-brush: #ff9800;
+    in-out property <int> slot-color-picker-r: 255;
+    in-out property <int> slot-color-picker-g: 152;
+    in-out property <int> slot-color-picker-b: 0;
+    in-out property <brush> slot-color-picker-preview: #ff9800;
+    in-out property <image> slot-editor-icon-preview;
+    in-out property <bool> show-slot-color-picker: false;
+    in-out property <bool> show-slot-icon-picker: false;
+    in-out property <[int]> alarm-presets: [5, 10, 15, 30];
+
+    // Hauteur du panneau éditeur selon type / apparence / mode alarme (px).
+    private property <length> slot-editor-panel-height:
+        min(1020px,
+            270px
+            + (root.slot-editor-kind == "empty" ? 40px : 0px)
+            + (root.slot-editor-kind == "folder" ? 32px : 0px)
+            + (root.slot-editor-kind != "empty"
+                ? (root.slot-editor-appearance == "image" ? 330px : 120px)
+                : 0px)
+            + (root.slot-editor-kind == "sound" ? 150px : 0px)
+            + (root.slot-editor-kind == "script" ? 200px : 0px)
+            + (root.slot-editor-kind == "alarm"
+                ? (root.slot-editor-alarm-mode == "clock" ? 310px : 400px)
+                : 0px)
+            + 56px
+            + 24px);
+
+    in-out property <bool> show-alarm-popup: false;
+    in-out property <string> alarm-popup-label: "";
+    in-out property <string> alarm-popup-time: "";
+
+    callback slot-clicked(int, int);
+    callback volume-changed(float);
+    callback stop-audio();
+    callback toggle-edit();
+    callback refresh-grid();
+    callback open-library();
+    callback close-library();
+    callback open-settings();
+    callback close-settings();
+    callback open-app-settings();
+    callback close-app-settings();
+    callback open-capture();
+    callback close-capture();
+    callback capture-record-toggle();
+    callback capture-cancel();
+    callback capture-save();
+    callback capture-refine();
+    callback capture-set-source(string);
+    callback open-clip-editor();
+    callback close-clip-editor();
+    callback clip-browse();
+    callback clip-export();
+    callback clip-range-start-changed(float);
+    callback clip-range-end-changed(float);
+    callback clip-preview-selection();
+    callback open-url-clip();
+    callback close-url-clip();
+    callback url-load();
+    callback url-range-start-changed(float);
+    callback url-range-end-changed(float);
+    callback url-preview-selection();
+    callback url-extract();
+    callback library-add-file();
+    callback library-delete();
+    callback library-preview();
+    callback library-choose();
+    callback slot-open-sound-library();
+    callback open-image-library();
+    callback close-image-library();
+    callback image-library-add-file();
+    callback image-library-add-url(string);
+    callback image-library-delete();
+    callback image-library-preview();
+    callback image-library-choose();
+    callback slot-open-image-library();
+    callback settings-save();
+    callback slot-editor-save();
+    callback slot-editor-close();
+    callback slot-set-kind-empty();
+    callback slot-set-kind-sound();
+    callback slot-set-kind-folder();
+    callback slot-set-kind-script();
+    callback slot-set-script-shell(string);
+    callback slot-browse-script();
+    callback slot-set-kind-alarm();
+    callback slot-test-alarm();
+    callback alarm-popup-dismiss();
+    callback slot-pick-icon(string);
+    callback slot-pick-color(string);
+    callback slot-color-picker-rgb-changed();
+    callback slot-color-picker-apply();
+    callback slot-open-color-picker();
+    callback slot-close-color-picker();
+    callback slot-open-icon-picker();
+    callback slot-close-icon-picker();
+    callback slot-editor-sound-preview();
+    callback slot-set-appearance-color();
+    callback slot-set-appearance-image();
+    callback slot-set-alarm-mode-clock();
+    callback slot-set-alarm-mode-timer();
+    callback slot-import-image-file();
+    callback slot-import-image-url(string);
+    callback slot-clear-custom-image();
+    callback slot-create-folder();
+    callback slot-shortcut-capture-start();
+    callback slot-shortcut-reset-default();
+    callback open-tools-menu();
+    callback close-tools-menu();
+    callback window-drag();
+    callback window-quit();
+
+    root-layer := Rectangle {
+        width: 100%;
+        height: 100%;
+        background: Theme.bg;
+        border-radius: 10px;
+        clip: true;
+
+        main-content := VerticalLayout {
+            width: parent.width;
+            padding-left: 8px;
+            padding-right: 8px;
+            padding-top: 2px;
+            padding-bottom: 2px;
+            spacing: 3px;
+            alignment: start;
+
+        AppTopBar {
+            page-path: root.page-path;
+            edit-mode: root.edit-mode;
+            drag-request => { root.window-drag(); }
+            quit => { root.window-quit(); }
+            open-settings => { root.open-settings(); }
+            toggle-edit => { root.toggle-edit(); }
+        }
+
+        if root.edit-mode: Rectangle {
+            height: 2px;
+            width: 100%;
+            background: Theme.accent;
+            border-radius: 1px;
+        }
+
+        HorizontalLayout {
+            alignment: center;
+            Rectangle {
+                background: Theme.bezel;
+                border-radius: 12px;
+                border-width: 2px;
+                border-color: Theme.key-border;
+                VerticalLayout {
+                    padding: 10px;
+                    alignment: center;
+                    Grid5x3 {
+                        slots: root.grid-slots;
+                        slot-clicked(row, col) => { root.slot-clicked(row, col); }
+                    }
+                }
+            }
+        }
+
+        HorizontalLayout {
+            width: 100%;
+            spacing: 6px;
+            alignment: center;
+            Rectangle {
+                width: Theme.stop-width;
+                height: Theme.stop-height;
+                background: stop-touch.has-hover ? #ff5252 : Theme.danger;
+                border-radius: 6px;
+                border-width: 1px;
+                border-color: Theme.key-border;
+                Text {
+                    text: "STOP";
+                    color: white;
+                    font-size: 9px;
+                    font-weight: 700;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    letter-spacing: 0.5px;
+                }
+                stop-touch := TouchArea {
+                    width: 100%;
+                    height: 100%;
+                    clicked => { root.stop-audio(); }
+                }
+            }
+            Rectangle {
+                width: 180px;
+                height: 36px;
+                background: Theme.bar;
+                border-radius: 6px;
+                VerticalLayout {
+                    padding: 6px;
+                    alignment: center;
+                    Text { text: @tr("Volume"); color: #888; font-size: 8px; }
+                    Slider {
+                        minimum: 0;
+                        maximum: 1;
+                        value: root.global-volume;
+                        changed(vol) => {
+                            root.global-volume = vol;
+                            root.volume-changed(vol);
+                        }
+                    }
+                }
+            }
+        }
+        }
+
+    if root.show-tools-menu: Rectangle {
+        width: 100%;
+        height: 100%;
+        background: #000000cc;
+        TouchArea { clicked => { root.close-tools-menu(); } }
+        Rectangle {
+            width: min(360px, parent.width - 20px);
+            height: min(280px, parent.height - 20px);
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - self.height) / 2;
+            background: Theme.bezel;
+            border-radius: 12px;
+            border-width: 2px;
+            border-color: #000;
+            VerticalLayout {
+                padding: 14px;
+                spacing: 10px;
+                Text {
+                    text: @tr("Tools");
+                    color: Theme.text;
+                    font-size: 12px;
+                    font-weight: 700;
+                    horizontal-alignment: center;
+                }
+                HorizontalLayout {
+                    spacing: Theme.key-gap;
+                    alignment: center;
+                    DeckKey { title: "Capture"; icon: "🎤"; key-color: #c62828; activated => { root.open-capture(); } }
+                    DeckKey { title: "Clip"; icon: "✂"; key-color: #ef6c00; activated => { root.open-clip-editor(); } }
+                    DeckKey { title: "URL"; icon: "🔗"; key-color: #0277bd; activated => { root.open-url-clip(); } }
+                }
+                ModalFooterClose {
+                    close => { root.close-tools-menu(); }
+                }
+            }
+        }
+    }
+
+    if root.show-slot-editor: Rectangle {
+        width: 100%;
+        height: 100%;
+        background: #000000cc;
+        editor-backdrop := TouchArea {
+            enabled: !root.show-image-library && !root.show-library;
+            clicked => { root.slot-editor-close(); }
+        }
+        editor-panel := Rectangle {
+            width: min(480px, parent.width - 20px);
+            height: min(root.slot-editor-panel-height, parent.height - 20px);
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - self.height) / 2;
+            background: Theme.bezel;
+            border-radius: 12px;
+            border-width: 1px;
+            border-color: Theme.key-border;
+            VerticalLayout {
+                padding: 14px;
+                spacing: 8px;
+                Text { text: @tr("Configure button"); color: Theme.text; font-size: 12px; font-weight: 700; }
+                Text { text: @tr("Button type"); color: #888; font-size: 9px; }
+                HorizontalLayout {
+                    spacing: 5px;
+                    alignment: start;
+                    width: 100%;
+                    DeckKey {
+                        mini: true;
+                        horizontal-stretch: 1;
+                        title: @tr("Empty");
+                        key-color: root.slot-editor-kind == "empty" ? Theme.accent : Theme.btn;
+                        activated => { root.slot-set-kind-empty(); }
+                    }
+                    DeckKey {
+                        mini: true;
+                        horizontal-stretch: 1;
+                        title: @tr("Sound");
+                        icon: "♪";
+                        key-color: root.slot-editor-kind == "sound" ? Theme.sound : Theme.btn;
+                        activated => { root.slot-set-kind-sound(); }
+                    }
+                    DeckKey {
+                        mini: true;
+                        horizontal-stretch: 1;
+                        title: @tr("Folder");
+                        icon: "📁";
+                        key-color: root.slot-editor-kind == "folder" ? Theme.folder : Theme.btn;
+                        activated => { root.slot-set-kind-folder(); }
+                    }
+                    DeckKey {
+                        mini: true;
+                        horizontal-stretch: 1;
+                        title: "Script";
+                        icon: "▶";
+                        key-color: root.slot-editor-kind == "script" ? #ef6c00 : Theme.btn;
+                        activated => { root.slot-set-kind-script(); }
+                    }
+                    DeckKey {
+                        mini: true;
+                        horizontal-stretch: 1;
+                        title: @tr("Alarm");
+                        icon: "⏰";
+                        key-color: root.slot-editor-kind == "alarm" ? #c62828 : Theme.btn;
+                        activated => { root.slot-set-kind-alarm(); }
+                    }
+                }
+                ScrollView {
+                    vertical-stretch: 1;
+                    VerticalLayout {
+                width: 100%;
+                spacing: 8px;
+                Text { text: @tr("Button name"); color: #888; font-size: 9px; }
+                LineEdit {
+                    text <=> root.slot-editor-label;
+                    placeholder-text: @tr("Optional — e.g. Applause, Intro");
+                }
+                Text { text: @tr("Keyboard shortcut"); color: #888; font-size: 9px; }
+                HorizontalLayout {
+                    spacing: 6px;
+                    Text {
+                        text: root.slot-editor-shortcut-capturing
+                            ? @tr("Press a key…")
+                            : @tr("Key: {}", root.slot-editor-shortcut-label);
+                        color: root.slot-editor-shortcut-capturing ? Theme.accent : Theme.text;
+                        font-size: 10px;
+                        font-weight: 700;
+                        vertical-alignment: center;
+                        horizontal-stretch: 1;
+                    }
+                    ActionBtn {
+                        label: @tr("Change");
+                        bg: root.slot-editor-shortcut-capturing ? Theme.accent : Theme.btn;
+                        horizontal-stretch: 0;
+                        min-width: 72px;
+                        pressed => { root.slot-shortcut-capture-start(); }
+                    }
+                    ActionBtn {
+                        label: @tr("Default");
+                        bg: Theme.btn;
+                        horizontal-stretch: 0;
+                        min-width: 72px;
+                        pressed => { root.slot-shortcut-reset-default(); }
+                    }
+                }
+                if root.slot-editor-shortcut-error != "": Text {
+                    text: root.slot-editor-shortcut-error;
+                    color: #e65100;
+                    font-size: 8px;
+                    wrap: word-wrap;
+                }
+                Text {
+                    text: @tr("Default grid: A-Z-E-R-T / Q-S-D-F-G / W-X-C-V-B (physical AZERTY positions).");
+                    color: #888;
+                    font-size: 8px;
+                    wrap: word-wrap;
+                }
+                if root.slot-editor-kind == "folder": Text {
+                    text: @tr("For a folder, this name also creates the path /home/name.");
+                    color: #888;
+                    font-size: 8px;
+                    wrap: word-wrap;
+                }
+                if root.slot-editor-kind == "empty": Text {
+                    text: @tr("Black key, no icon (no action on click)");
+                    color: #888;
+                    font-size: 9px;
+                    wrap: word-wrap;
+                }
+                if root.slot-editor-kind != "empty": Text { text: @tr("Button appearance"); color: #888; font-size: 9px; }
+                if root.slot-editor-kind != "empty": HorizontalLayout {
+                    spacing: 6px;
+                    ActionBtn {
+                        label: @tr("Color + icon");
+                        bg: root.slot-editor-appearance == "color" ? Theme.accent : Theme.btn;
+                        pressed => { root.slot-set-appearance-color(); }
+                    }
+                    ActionBtn {
+                        label: @tr("Image");
+                        bg: root.slot-editor-appearance == "image" ? Theme.accent : Theme.btn;
+                        pressed => { root.slot-set-appearance-image(); }
+                    }
+                }
+                if root.slot-editor-kind != "empty" && root.slot-editor-appearance == "color": HorizontalLayout {
+                    spacing: 20px;
+                    alignment: start;
+                    Text { text: @tr("Color"); color: #888; font-size: 9px; vertical-alignment: center; }
+                    Rectangle {
+                        width: 40px;
+                        height: 40px;
+                        background: root.slot-editor-color-brush;
+                        border-radius: 8px;
+                        border-width: 2px;
+                        border-color: #888;
+                        color-touch := TouchArea {
+                            width: 100%;
+                            height: 100%;
+                            clicked => { root.slot-open-color-picker(); }
+                        }
+                    }
+                    Text { text: @tr("Icon"); color: #888; font-size: 9px; vertical-alignment: center; }
+                    Rectangle {
+                        width: 40px;
+                        height: 40px;
+                        background: #333;
+                        border-radius: 8px;
+                        border-width: 2px;
+                        border-color: #888;
+                        Image {
+                            source: root.slot-editor-icon-preview;
+                            width: 26px;
+                            height: 26px;
+                            x: (parent.width - self.width) / 2;
+                            y: (parent.height - self.height) / 2;
+                        }
+                        icon-touch := TouchArea {
+                            width: 100%;
+                            height: 100%;
+                            clicked => { root.slot-open-icon-picker(); }
+                        }
+                    }
+                }
+                if root.slot-editor-kind != "empty" && root.slot-editor-appearance == "image": VerticalLayout {
+                    spacing: 6px;
+                    Rectangle {
+                        width: 72px;
+                        height: 72px;
+                        background: #222;
+                        border-radius: 10px;
+                        border-width: 2px;
+                        border-color: photo-touch.has-hover ? Theme.accent : #666;
+                        clip: true;
+                        Image {
+                            source: root.slot-editor-photo-preview;
+                            width: 72px;
+                            height: 72px;
+                            image-fit: cover;
+                        }
+                        photo-touch := TouchArea {
+                            width: 100%;
+                            height: 100%;
+                            clicked => { root.slot-open-image-library(); }
+                        }
+                    }
+                    HorizontalLayout {
+                        spacing: 6px;
+                        ActionBtn {
+                            label: @tr("File");
+                            bg: Theme.btn;
+                            pressed => { root.slot-import-image-file(); }
+                        }
+                        ActionBtn {
+                            label: @tr("Library");
+                            bg: Theme.accent;
+                            pressed => { root.slot-open-image-library(); }
+                        }
+                        ActionBtn {
+                            label: @tr("Clear");
+                            bg: #333;
+                            pressed => { root.slot-clear-custom-image(); }
+                        }
+                    }
+                    slot-image-url-input := LineEdit {
+                        text <=> root.slot-editor-image-url;
+                        placeholder-text: @tr("https://... (Unsplash, direct link, …)");
+                        accepted => { root.slot-import-image-url(self.text); }
+                    }
+                    DeckKey {
+                        title: @tr("Download URL");
+                        icon: "⬇";
+                        key-color: Theme.accent;
+                        activated => { root.slot-import-image-url(slot-image-url-input.text); }
+                    }
+                }
+                if root.slot-editor-kind == "script": VerticalLayout {
+                    spacing: 6px;
+                    Text { text: @tr("Interpreter"); color: #888; font-size: 9px; }
+                    HorizontalLayout {
+                        spacing: 4px;
+                        DeckKey {
+                            mini: true;
+                            horizontal-stretch: 1;
+                            title: "PS";
+                            key-color: root.slot-editor-script-shell == "powershell" ? #ef6c00 : Theme.btn;
+                            activated => { root.slot-set-script-shell("powershell"); }
+                        }
+                        DeckKey {
+                            mini: true;
+                            horizontal-stretch: 1;
+                            title: "CMD";
+                            key-color: root.slot-editor-script-shell == "cmd" ? #ef6c00 : Theme.btn;
+                            activated => { root.slot-set-script-shell("cmd"); }
+                        }
+                        DeckKey {
+                            mini: true;
+                            horizontal-stretch: 1;
+                            title: "Bash";
+                            key-color: root.slot-editor-script-shell == "bash" ? #ef6c00 : Theme.btn;
+                            activated => { root.slot-set-script-shell("bash"); }
+                        }
+                        DeckKey {
+                            mini: true;
+                            horizontal-stretch: 1;
+                            title: "Py";
+                            key-color: root.slot-editor-script-shell == "python" ? #ef6c00 : Theme.btn;
+                            activated => { root.slot-set-script-shell("python"); }
+                        }
+                    }
+                    LineEdit {
+                        text <=> root.slot-editor-script;
+                        placeholder-text: @tr("Script path (e.g. C:\\scripts\\action.ps1)");
+                    }
+                    ActionBtn {
+                        label: @tr("Browse");
+                        bg: Theme.btn;
+                        pressed => { root.slot-browse-script(); }
+                    }
+                    Text {
+                        text: @tr("The script runs with the selected interpreter. Custom paths in Settings.");
+                        color: #888;
+                        font-size: 8px;
+                        wrap: word-wrap;
+                    }
+                }
+                if root.slot-editor-kind == "alarm": VerticalLayout {
+                    spacing: 6px;
+                    Text { text: @tr("Alarm mode"); color: #888; font-size: 9px; }
+                    HorizontalLayout {
+                        spacing: 6px;
+                        DeckKey {
+                            title: @tr("Clock");
+                            icon: "🕐";
+                            key-color: root.slot-editor-alarm-mode == "clock" ? #c62828 : Theme.btn;
+                            activated => { root.slot-set-alarm-mode-clock(); }
+                        }
+                        DeckKey {
+                            title: @tr("Timer");
+                            icon: "⏱";
+                            key-color: root.slot-editor-alarm-mode == "timer" ? #c62828 : Theme.btn;
+                            activated => { root.slot-set-alarm-mode-timer(); }
+                        }
+                    }
+                    if root.slot-editor-alarm-mode == "clock": VerticalLayout {
+                        spacing: 4px;
+                        Text { text: @tr("Trigger time"); color: #888; font-size: 9px; }
+                        HorizontalLayout {
+                            spacing: 8px;
+                            Text { text: "H"; color: #aaa; font-size: 9px; vertical-alignment: center; }
+                            ComboBox {
+                                model: root.slot-editor-hour-options;
+                                current-index <=> root.slot-editor-alarm-hour-index;
+                            }
+                            Text { text: "min"; color: #aaa; font-size: 9px; vertical-alignment: center; }
+                            ComboBox {
+                                model: root.slot-editor-minute-options;
+                                current-index <=> root.slot-editor-alarm-minute-index;
+                            }
+                        }
+                    }
+                    if root.slot-editor-alarm-mode == "timer": VerticalLayout {
+                        spacing: 4px;
+                        Text { text: @tr("Presets 5·10·15·30 min or custom duration below"); color: #888; font-size: 9px; wrap: word-wrap; }
+                        HorizontalLayout {
+                            spacing: 4px;
+                            alignment: start;
+                            for preset[idx] in root.alarm-presets: DeckKey {
+                                title: preset + "m";
+                                key-color: root.slot-editor-alarm-minutes == preset ? #c62828 : Theme.btn;
+                                activated => {
+                                    root.slot-editor-alarm-minutes = preset;
+                                    root.slot-editor-alarm-minutes-text = "" + preset;
+                                }
+                            }
+                        }
+                        LineEdit {
+                            text <=> root.slot-editor-alarm-minutes-text;
+                            placeholder-text: @tr("Other duration in minutes (e.g. 7, 25, 90)");
+                        }
+                    }
+                    Text { text: @tr("Sound / music"); color: #888; font-size: 9px; }
+                    HorizontalLayout {
+                        spacing: 6px;
+                        Rectangle {
+                            horizontal-stretch: 1;
+                            height: 32px;
+                            background: #1a1a1a;
+                            border-radius: 8px;
+                            border-width: 1px;
+                            border-color: #444;
+                            Text {
+                                text: root.slot-editor-sound-title == "" ? @tr("No sound selected") : root.slot-editor-sound-title;
+                                color: root.slot-editor-sound-title == "" ? #888 : Theme.text;
+                                font-size: 10px;
+                                vertical-alignment: center;
+                                x: 10px;
+                            }
+                        }
+                        ActionBtn {
+                            label: @tr("Library");
+                            bg: Theme.sound;
+                            horizontal-stretch: 0;
+                            min-width: 100px;
+                            pressed => { root.slot-open-sound-library(); }
+                        }
+                    }
+                    HorizontalLayout {
+                        spacing: 6px;
+                        DeckKey {
+                            title: @tr("Play");
+                            icon: "▶";
+                            key-color: Theme.btn;
+                            activated => { root.slot-editor-sound-preview(); }
+                        }
+                        DeckKey {
+                            title: @tr("Test");
+                            icon: "🔔";
+                            key-color: #c62828;
+                            activated => { root.slot-test-alarm(); }
+                        }
+                    }
+                }
+                if root.slot-editor-kind == "sound": VerticalLayout {
+                    spacing: 6px;
+                    Text { text: @tr("Sound / music"); color: #888; font-size: 9px; }
+                    HorizontalLayout {
+                        spacing: 6px;
+                        Rectangle {
+                            horizontal-stretch: 1;
+                            height: 32px;
+                            background: #1a1a1a;
+                            border-radius: 8px;
+                            border-width: 1px;
+                            border-color: #444;
+                            Text {
+                                text: root.slot-editor-sound-title == "" ? @tr("No sound selected") : root.slot-editor-sound-title;
+                                color: root.slot-editor-sound-title == "" ? #888 : Theme.text;
+                                font-size: 10px;
+                                vertical-alignment: center;
+                                x: 10px;
+                            }
+                        }
+                        ActionBtn {
+                            label: @tr("Library");
+                            bg: Theme.sound;
+                            horizontal-stretch: 0;
+                            min-width: 100px;
+                            pressed => { root.slot-open-sound-library(); }
+                        }
+                    }
+                    DeckKey {
+                        title: @tr("Play");
+                        icon: "▶";
+                        key-color: Theme.btn;
+                        activated => { root.slot-editor-sound-preview(); }
+                    }
+                }
+                }
+                }
+                ModalFooterSaveClose {
+                    save => { root.slot-editor-save(); }
+                    close => { root.slot-editor-close(); }
+                }
+            }
+        }
+    }
+
+    // Au-dessus de l'editeur de touche quand les deux sont ouverts
+    if root.show-library: Rectangle {
+        width: 100%;
+        height: 100%;
+        background: #000000cc;
+        lib-backdrop := TouchArea {
+            clicked => { root.close-library(); }
+        }
+        Rectangle {
+            width: min(420px, parent.width - 20px);
+            height: min(520px, parent.height - 20px);
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - self.height) / 2;
+            background: Theme.bezel;
+            border-radius: 12px;
+            VerticalLayout {
+                padding: 12px;
+                spacing: 6px;
+                Text { text: @tr("Sound library"); color: Theme.text; font-size: 12px; font-weight: 700; }
+                if !root.library-pick-mode: ActionBtn {
+                    label: @tr("+ File");
+                    bg: Theme.sound;
+                    pressed => { root.library-add-file(); }
+                }
+                Rectangle {
+                    vertical-stretch: 1;
+                    background: #0a0a0a;
+                    border-radius: 8px;
+                    ListView {
+                        for title[idx] in root.library-titles: LibraryRow {
+                            title: title;
+                            selected: root.library-selected == idx;
+                            clicked => { root.library-selected = idx; }
+                        }
+                    }
+                }
+                Text {
+                    text: root.library-pick-mode
+                        ? @tr("1) Click a sound  2) Select  3) Save in the editor")
+                        : @tr("Manage your sounds — import, play, delete.");
+                    color: #888;
+                    font-size: 8px;
+                    wrap: word-wrap;
+                }
+                HorizontalLayout {
+                    spacing: Theme.key-gap;
+                    ActionBtn {
+                        label: @tr("Play");
+                        bg: Theme.btn;
+                        horizontal-stretch: 0;
+                        min-width: 88px;
+                        pressed => { root.library-preview(); }
+                    }
+                    if root.library-pick-mode: ActionBtn {
+                        label: @tr("Select");
+                        bg: Theme.accent;
+                        horizontal-stretch: 0;
+                        min-width: 88px;
+                        pressed => { root.library-choose(); }
+                    }
+                    Rectangle { horizontal-stretch: 1; }
+                    if !root.library-pick-mode: ModalDeleteBtn {
+                        pressed => { root.library-delete(); }
+                    }
+                    ModalCloseBtn {
+                        pressed => { root.close-library(); }
+                    }
+                }
+            }
+        }
+    }
+
+    if root.show-image-library: Rectangle {
+        width: 100%;
+        height: 100%;
+        background: #000000cc;
+        image-lib-backdrop := TouchArea {
+            clicked => { root.close-image-library(); }
+        }
+        Rectangle {
+            width: min(460px, parent.width - 20px);
+            height: min(600px, parent.height - 20px);
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - self.height) / 2;
+            background: Theme.bezel;
+            border-radius: 12px;
+            VerticalLayout {
+                padding: 12px;
+                spacing: 6px;
+                Text { text: @tr("Image library"); color: Theme.text; font-size: 12px; font-weight: 700; }
+                ActionBtn {
+                    label: @tr("+ File");
+                    bg: Theme.accent;
+                    pressed => { root.image-library-add-file(); }
+                }
+                HorizontalLayout {
+                    spacing: 6px;
+                    image-lib-url-input := LineEdit {
+                        horizontal-stretch: 2;
+                        text <=> root.image-library-url;
+                        placeholder-text: @tr("Image URL");
+                        accepted => { root.image-library-add-url(self.text); }
+                    }
+                    image-lib-name-input := LineEdit {
+                        horizontal-stretch: 1;
+                        text <=> root.image-library-name;
+                        placeholder-text: @tr("Name");
+                    }
+                    ActionBtn {
+                        label: "URL";
+                        bg: Theme.btn;
+                        horizontal-stretch: 0;
+                        min-width: 52px;
+                        pressed => { root.image-library-add-url(image-lib-url-input.text); }
+                    }
+                }
+                Rectangle {
+                    height: 72px;
+                    background: #222;
+                    border-radius: 8px;
+                    border-width: 1px;
+                    border-color: #555;
+                    clip: true;
+                    Image {
+                        source: root.image-library-thumb;
+                        width: parent.width;
+                        height: parent.height;
+                        image-fit: contain;
+                    }
+                }
+                Rectangle {
+                    min-height: 220px;
+                    vertical-stretch: 1;
+                    background: #0a0a0a;
+                    border-radius: 8px;
+                    ListView {
+                        for title[idx] in root.image-library-titles: ImageLibraryRow {
+                            title: title;
+                            selected: root.image-library-selected == idx;
+                            clicked => {
+                                root.image-library-selected = idx;
+                                root.image-library-preview();
+                            }
+                        }
+                    }
+                }
+                Text {
+                    text: root.image-library-pick-mode
+                        ? @tr("1) Click an image  2) Select  3) Save in the editor")
+                        : @tr("Shared images — import here, then assign in edit mode.");
+                    color: #888;
+                    font-size: 8px;
+                    wrap: word-wrap;
+                }
+                HorizontalLayout {
+                    spacing: Theme.key-gap;
+                    if root.image-library-pick-mode: ActionBtn {
+                        label: @tr("Select");
+                        bg: Theme.accent;
+                        horizontal-stretch: 0;
+                        min-width: 88px;
+                        pressed => { root.image-library-choose(); }
+                    }
+                    Rectangle { horizontal-stretch: 1; }
+                    ModalDeleteBtn {
+                        pressed => { root.image-library-delete(); }
+                    }
+                    ModalCloseBtn {
+                        pressed => { root.close-image-library(); }
+                    }
+                }
+            }
+        }
+    }
+
+    if root.show-settings: Rectangle {
+        width: 100%;
+        height: 100%;
+        background: #000000cc;
+        Rectangle {
+            width: min(340px, parent.width - 20px);
+            height: min(300px, parent.height - 24px);
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - self.height) / 2;
+            background: Theme.bezel;
+            border-radius: 12px;
+            VerticalLayout {
+                padding: 14px;
+                spacing: 10px;
+                Text {
+                    text: @tr("Settings");
+                    color: Theme.text;
+                    font-size: 12px;
+                    font-weight: 700;
+                    horizontal-alignment: center;
+                }
+                HorizontalLayout {
+                    spacing: Theme.key-gap;
+                    alignment: center;
+                    DeckKey {
+                        title: @tr("Sounds");
+                        icon: "♪";
+                        key-color: Theme.sound;
+                        activated => { root.open-library(); }
+                    }
+                    DeckKey {
+                        title: @tr("Images");
+                        icon: "🖼";
+                        key-color: Theme.accent;
+                        activated => { root.open-image-library(); }
+                    }
+                }
+                HorizontalLayout {
+                    spacing: Theme.key-gap;
+                    alignment: center;
+                    DeckKey {
+                        title: @tr("Tools");
+                        icon: "🛠";
+                        key-color: Theme.tools;
+                        activated => { root.open-tools-menu(); }
+                    }
+                    DeckKey {
+                        title: @tr("Application");
+                        icon: "⚙";
+                        key-color: #455a64;
+                        activated => { root.open-app-settings(); }
+                    }
+                }
+                ModalFooterClose {
+                    close => { root.close-settings(); }
+                }
+            }
+        }
+    }
+
+    if root.show-app-settings: Rectangle {
+        width: 100%;
+        height: 100%;
+        background: #000000cc;
+        Rectangle {
+            width: min(380px, parent.width - 20px);
+            height: min(730px, parent.height - 24px);
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - self.height) / 2;
+            background: Theme.bezel;
+            border-radius: 12px;
+            VerticalLayout {
+                padding: 14px;
+                spacing: 8px;
+                Text {
+                    text: @tr("Application settings");
+                    color: Theme.text;
+                    font-size: 12px;
+                    font-weight: 700;
+                }
+                VerticalLayout {
+                    spacing: 8px;
+                    Text { text: @tr("Audio playback"); color: #aaa; font-size: 9px; }
+                        HorizontalLayout {
+                            Text { text: @tr("Policy"); color: #ccc; font-size: 9px; vertical-alignment: center; }
+                            ComboBox {
+                                model: ["stop_previous", "overlap", "limited"];
+                                current-value <=> root.settings-policy;
+                            }
+                        }
+                        Text {
+                            text: @tr("stop_previous = stop current sound; overlap = layer sounds; limited = cap concurrent sounds.");
+                            color: #888;
+                            font-size: 8px;
+                            wrap: word-wrap;
+                        }
+                        Text { text: @tr("Max channels (e.g. 3)"); color: #ccc; font-size: 9px; }
+                        LineEdit { text <=> root.settings-max-channels; placeholder-text: "3"; }
+                        Text {
+                            text: @tr("Maximum sounds playing at once. Used only in « limited » mode. 3 = at most three concurrent sounds.");
+                            color: #888;
+                            font-size: 8px;
+                            wrap: word-wrap;
+                        }
+                        Text { text: @tr("Target loudness LUFS (e.g. -16)"); color: #ccc; font-size: 9px; }
+                        LineEdit { text <=> root.settings-lufs; placeholder-text: "-16"; }
+                        Text {
+                            text: @tr("Target loudness on import (file, URL, capture). -16 = loud (broadcast); -23 = quieter. ffmpeg normalizes to this value (ffmpeg required).");
+                            color: #888;
+                            font-size: 8px;
+                            wrap: word-wrap;
+                        }
+                        Text { text: @tr("Max capture duration (seconds, e.g. 60)"); color: #ccc; font-size: 9px; }
+                        LineEdit { text <=> root.settings-capture-max-s; placeholder-text: "60"; }
+                        Text {
+                            text: @tr("Maximum length of a mic or PC recording. 60 = one minute max, then auto-stop.");
+                            color: #888;
+                            font-size: 8px;
+                            wrap: word-wrap;
+                        }
+                        Text { text: @tr("Script interpreters (empty = auto-detect)"); color: #aaa; font-size: 9px; }
+                        LineEdit {
+                            text <=> root.settings-shell-powershell;
+                            placeholder-text: @tr("PowerShell (e.g. C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe)");
+                        }
+                        LineEdit {
+                            text <=> root.settings-shell-cmd;
+                            placeholder-text: @tr("CMD (e.g. C:\\Windows\\System32\\cmd.exe)");
+                        }
+                        LineEdit {
+                            text <=> root.settings-shell-bash;
+                            placeholder-text: @tr("Bash (e.g. /bin/bash or C:\\Program Files\\Git\\bin\\bash.exe)");
+                        }
+                        LineEdit {
+                            text <=> root.settings-shell-python;
+                            placeholder-text: @tr("Python (e.g. python, python3, C:\\Python312\\python.exe)");
+                        }
+                        Text { text: @tr("Window"); color: #aaa; font-size: 9px; }
+                    CheckBox {
+                        text: @tr("Enable grid shortcuts");
+                        checked <=> root.settings-grid-shortcuts-enabled;
+                    }
+                    Text {
+                        text: @tr("Row 1: A Z E R T — Row 2: Q S D F G — Row 3: W X C V B (AZERTY positions).");
+                        color: #888;
+                        font-size: 8px;
+                        wrap: word-wrap;
+                    }
+                    CheckBox {
+                        text: @tr("Keep Streamdeck on top");
+                        checked <=> root.settings-always-on-top;
+                    }
+                    Text { text: @tr("Language"); color: #aaa; font-size: 9px; }
+                    HorizontalLayout {
+                        spacing: 8px;
+                        alignment: start;
+                        DeckKey {
+                            mini: true;
+                            title: "English";
+                            key-color: root.settings-language == "en" ? Theme.accent : Theme.btn;
+                            activated => { root.settings-language = "en"; }
+                        }
+                        DeckKey {
+                            mini: true;
+                            title: "Français";
+                            key-color: root.settings-language == "fr" ? Theme.accent : Theme.btn;
+                            activated => { root.settings-language = "fr"; }
+                        }
+                    }
+                }
+                ModalFooterSaveClose {
+                    save => { root.settings-save(); }
+                    close => { root.close-app-settings(); }
+                }
+            }
+        }
+    }
+
+    if root.show-capture: Rectangle {
+        width: 100%;
+        height: 100%;
+        background: #000000cc;
+        Rectangle {
+            width: min(440px, parent.width - 20px);
+            height: min(480px, parent.height - 20px);
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - self.height) / 2;
+            background: Theme.bezel;
+            border-radius: 12px;
+            VerticalLayout {
+                padding: 14px;
+                spacing: 8px;
+                Text { text: @tr("Audio recording"); color: Theme.text; font-size: 12px; font-weight: 700; }
+                Text { text: @tr("Source"); color: #888; font-size: 9px; }
+                HorizontalLayout {
+                    spacing: 8px;
+                    alignment: center;
+                    DeckKey {
+                        title: @tr("Mic");
+                        icon: "🎤";
+                        key-color: root.capture-source == "microphone" ? Theme.accent : Theme.btn;
+                        activated => { root.capture-set-source("microphone"); }
+                    }
+                    DeckKey {
+                        title: "PC";
+                        icon: "🔊";
+                        key-color: !root.capture-loopback-available ? #333 :
+                            root.capture-source == "loopback" ? #1565c0 : Theme.btn;
+                        activated => {
+                            if (root.capture-loopback-available) {
+                                root.capture-set-source("loopback");
+                            }
+                        }
+                    }
+                }
+                Text {
+                    text: root.capture-device-hint;
+                    color: #ffb703;
+                    font-size: 9px;
+                    wrap: word-wrap;
+                }
+                Text {
+                    text: root.capture-source == "loopback"
+                        ? @tr("Music, games and browser audio are recorded (speaker output).")
+                        : @tr("The microphone records your voice or a sound near the mic.");
+                    color: #888;
+                    font-size: 8px;
+                    wrap: word-wrap;
+                }
+                Text {
+                    text: root.capture-state == "recording" ? @tr("● Recording") : root.capture-state == "ready" ? @tr("✓ Done") : @tr("Press REC");
+                    color: #888;
+                    font-size: 9px;
+                    horizontal-alignment: center;
+                }
+                Text {
+                    text: root.capture-timer;
+                    color: Theme.accent;
+                    font-size: 28px;
+                    font-weight: 700;
+                    horizontal-alignment: center;
+                }
+                Text {
+                    text: root.capture-duration-label;
+                    color: #aaa;
+                    font-size: 10px;
+                    horizontal-alignment: center;
+                }
+                Rectangle {
+                    height: 6px;
+                    background: #222;
+                    border-radius: 3px;
+                    Rectangle {
+                        width: parent.width * root.capture-level;
+                        height: parent.height;
+                        background: Theme.accent;
+                        border-radius: 3px;
+                    }
+                }
+                LineEdit {
+                    text <=> root.capture-title;
+                    placeholder-text: @tr("Name (e.g. Applause)");
+                }
+                HorizontalLayout {
+                    spacing: Theme.key-gap;
+                    ActionBtn {
+                        label: root.capture-state == "recording" ? "Stop" : "REC";
+                        bg: #c62828;
+                        horizontal-stretch: 0;
+                        min-width: 88px;
+                        pressed => { root.capture-record-toggle(); }
+                    }
+                    ActionBtn {
+                        label: @tr("Save");
+                        bg: root.capture-can-save ? Theme.accent : #444;
+                        horizontal-stretch: 0;
+                        min-width: 88px;
+                        pressed => { if (root.capture-can-save) { root.capture-save(); } }
+                    }
+                    ActionBtn {
+                        label: @tr("Cancel");
+                        bg: Theme.btn;
+                        horizontal-stretch: 0;
+                        min-width: 88px;
+                        pressed => { root.capture-cancel(); }
+                    }
+                    Rectangle { horizontal-stretch: 1; }
+                    ModalCloseBtn {
+                        pressed => { root.close-capture(); }
+                    }
+                }
+            }
+        }
+    }
+
+    if root.show-clip-editor: Rectangle {
+        width: 100%;
+        height: 100%;
+        background: #000000cc;
+        Rectangle {
+            width: min(560px, parent.width - 20px);
+            height: min(580px, parent.height - 20px);
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - self.height) / 2;
+            background: Theme.bezel;
+            border-radius: 12px;
+            VerticalLayout {
+                padding: 14px;
+                spacing: 8px;
+                Text { text: @tr("Local trim"); color: Theme.text; font-size: 12px; font-weight: 700; }
+                ScrollView {
+                    vertical-stretch: 1;
+                    VerticalLayout {
+                        width: 100%;
+                        spacing: 8px;
+                        HorizontalLayout {
+                            spacing: 6px;
+                            LineEdit {
+                                horizontal-stretch: 1;
+                                text <=> root.clip-source-path;
+                                placeholder-text: @tr("Source audio file");
+                            }
+                            ActionBtn {
+                                label: @tr("Browse");
+                                bg: Theme.btn;
+                                horizontal-stretch: 0;
+                                min-width: 88px;
+                                pressed => { root.clip-browse(); }
+                            }
+                        }
+                        if root.clip-status-msg != "": Text {
+                            text: root.clip-status-msg;
+                            color: #e65100;
+                            font-size: 8px;
+                            wrap: word-wrap;
+                        }
+                        if root.clip-duration-secs > 0: ClipTimeline {
+                            waveform: root.clip-waveform;
+                            range-start <=> root.clip-range-start;
+                            range-end <=> root.clip-range-end;
+                            start-label: root.clip-start-label;
+                            end-label: root.clip-end-label;
+                            range-start-changed(r) => { root.clip-range-start-changed(r); }
+                            range-end-changed(r) => { root.clip-range-end-changed(r); }
+                        }
+                        if root.clip-duration-secs <= 0: Text {
+                            text: @tr("Browse an audio file — the waveform appears here with two cursors.");
+                            color: #888;
+                            font-size: 8px;
+                            wrap: word-wrap;
+                        }
+                        if root.clip-duration-secs > 0: HorizontalLayout {
+                            spacing: Theme.key-gap;
+                            ActionBtn {
+                                label: @tr("Play selection");
+                                bg: Theme.sound;
+                                horizontal-stretch: 1;
+                                pressed => { root.clip-preview-selection(); }
+                            }
+                        }
+                        LineEdit {
+                            text <=> root.clip-title;
+                            placeholder-text: @tr("Sound name (e.g. Chorus, Intro)");
+                            height: 32px;
+                        }
+                        Text {
+                            text: @tr("Move the green cursors, listen, then Save.");
+                            color: #888;
+                            font-size: 8px;
+                            wrap: word-wrap;
+                        }
+                    }
+                }
+                ModalFooterSaveClose {
+                    save => { root.clip-export(); }
+                    close => { root.close-clip-editor(); }
+                }
+            }
+        }
+    }
+
+    if root.show-url-clip: Rectangle {
+        width: 100%;
+        height: 100%;
+        background: #000000cc;
+        Rectangle {
+            width: min(560px, parent.width - 20px);
+            height: min(580px, parent.height - 20px);
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - self.height) / 2;
+            background: Theme.bezel;
+            border-radius: 12px;
+            VerticalLayout {
+                padding: 14px;
+                spacing: 8px;
+                Text { text: @tr("URL extract"); color: Theme.text; font-size: 12px; font-weight: 700; }
+                ScrollView {
+                    vertical-stretch: 1;
+                    VerticalLayout {
+                        width: 100%;
+                        spacing: 8px;
+                        HorizontalLayout {
+                            spacing: 6px;
+                            url-input-field := LineEdit {
+                                horizontal-stretch: 1;
+                                text <=> root.url-input;
+                                placeholder-text: @tr("https://... (YouTube, direct audio link)");
+                                enabled: !root.url-loading;
+                            }
+                            ActionBtn {
+                                label: root.url-loading ? "..." : @tr("Load");
+                                bg: Theme.btn;
+                                horizontal-stretch: 0;
+                                min-width: 88px;
+                                pressed => { root.url-load(); }
+                            }
+                        }
+                        CheckBox {
+                            text: @tr("Allow videos longer than 5 min");
+                            checked <=> root.url-bypass-limit;
+                            enabled: !root.url-loading;
+                        }
+                        if root.url-bypass-limit: Text {
+                            text: @tr("Warning: beyond 5 min, loading may take several minutes.");
+                            color: #e65100;
+                            font-size: 8px;
+                            wrap: word-wrap;
+                        }
+                        if !root.url-bypass-limit: Text {
+                            text: @tr("Default limit: videos up to 5 min to stay responsive.");
+                            color: #888;
+                            font-size: 8px;
+                            wrap: word-wrap;
+                        }
+                        if root.url-status-msg != "": Text {
+                            text: root.url-status-msg;
+                            color: #e65100;
+                            font-size: 8px;
+                            wrap: word-wrap;
+                        }
+                        if root.url-loading: Text {
+                            text: @tr("Download in progress — please wait…");
+                            color: Theme.accent;
+                            font-size: 9px;
+                            horizontal-alignment: center;
+                        }
+                        if root.url-duration-secs > 0: ClipTimeline {
+                            waveform: root.url-waveform;
+                            range-start <=> root.url-range-start;
+                            range-end <=> root.url-range-end;
+                            start-label: root.url-start-label;
+                            end-label: root.url-end-label;
+                            range-start-changed(r) => { root.url-range-start-changed(r); }
+                            range-end-changed(r) => { root.url-range-end-changed(r); }
+                        }
+                        if root.url-duration-secs <= 0 && !root.url-loading: Text {
+                            text: @tr("Paste a URL then Load — the waveform with two cursors appears here.");
+                            color: #888;
+                            font-size: 8px;
+                            wrap: word-wrap;
+                        }
+                        if root.url-duration-secs > 0: HorizontalLayout {
+                            spacing: Theme.key-gap;
+                            ActionBtn {
+                                label: @tr("Play selection");
+                                bg: Theme.sound;
+                                horizontal-stretch: 1;
+                                pressed => { root.url-preview-selection(); }
+                            }
+                        }
+                        LineEdit {
+                            text <=> root.url-title;
+                            placeholder-text: @tr("Sound name (e.g. Applause, Jingle)");
+                            enabled: !root.url-loading;
+                            height: 32px;
+                        }
+                        Text {
+                            text: @tr("Move the green cursors, listen, then Save.");
+                            color: #888;
+                            font-size: 8px;
+                            wrap: word-wrap;
+                        }
+                    }
+                }
+                ModalFooterSaveClose {
+                    save => { root.url-extract(); }
+                    close => { root.close-url-clip(); }
+                }
+            }
+        }
+    }
+
+    if root.show-slot-color-picker: Rectangle {
+        width: 100%;
+        height: 100%;
+        background: #000000aa;
+        TouchArea { clicked => { root.slot-close-color-picker(); } }
+        Rectangle {
+            width: min(320px, parent.width - 24px);
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - 340px) / 2;
+            height: 320px;
+            background: Theme.bezel;
+            border-radius: 12px;
+            VerticalLayout {
+                padding: 12px;
+                spacing: 8px;
+                Text { text: @tr("Button color"); color: Theme.text; font-size: 11px; font-weight: 700; }
+                Rectangle {
+                    height: 48px;
+                    border-radius: 8px;
+                    border-width: 2px;
+                    border-color: #666;
+                    background: root.slot-color-picker-preview;
+                }
+                HorizontalLayout {
+                    spacing: 8px;
+                    Text { text: "R"; color: #aaa; font-size: 9px; vertical-alignment: center; width: 12px; }
+                    Slider {
+                        minimum: 0;
+                        maximum: 255;
+                        value: root.slot-color-picker-r;
+                        changed(r) => { root.slot-color-picker-r = r; root.slot-color-picker-rgb-changed(); }
+                    }
+                }
+                HorizontalLayout {
+                    spacing: 8px;
+                    Text { text: "V"; color: #aaa; font-size: 9px; vertical-alignment: center; width: 12px; }
+                    Slider {
+                        minimum: 0;
+                        maximum: 255;
+                        value: root.slot-color-picker-g;
+                        changed(g) => { root.slot-color-picker-g = g; root.slot-color-picker-rgb-changed(); }
+                    }
+                }
+                HorizontalLayout {
+                    spacing: 8px;
+                    Text { text: "B"; color: #aaa; font-size: 9px; vertical-alignment: center; width: 12px; }
+                    Slider {
+                        minimum: 0;
+                        maximum: 255;
+                        value: root.slot-color-picker-b;
+                        changed(b) => { root.slot-color-picker-b = b; root.slot-color-picker-rgb-changed(); }
+                    }
+                }
+                HorizontalLayout {
+                    spacing: Theme.key-gap;
+                    alignment: end;
+                    ModalBtn {
+                        label: @tr("Apply");
+                        bg: Theme.accent;
+                        pressed => { root.slot-color-picker-apply(); }
+                    }
+                    ModalCloseBtn {
+                        pressed => { root.slot-close-color-picker(); }
+                    }
+                }
+            }
+        }
+    }
+
+    if root.show-slot-icon-picker: Rectangle {
+        width: 100%;
+        height: 100%;
+        background: #000000aa;
+        TouchArea { clicked => { root.slot-close-icon-picker(); } }
+        Rectangle {
+            width: min(340px, parent.width - 16px);
+            height: min(260px, parent.height - 24px);
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - self.height) / 2;
+            background: Theme.bezel;
+            border-radius: 12px;
+            VerticalLayout {
+                padding: 12px;
+                spacing: 6px;
+                VerticalLayout {
+                    spacing: 6px;
+                    Text { text: @tr("Choose an icon"); color: Theme.text; font-size: 11px; font-weight: 700; }
+                    HorizontalLayout { spacing: 4px;
+                        IconPickBtn { icon-id: "note_musique"; selected: root.slot-editor-icon == "note_musique"; icon-source: @image-url("icons/pack/note-de-musique.svg"); picked => { root.slot-pick-icon("note_musique"); } }
+                        IconPickBtn { icon-id: "musique_alt"; selected: root.slot-editor-icon == "musique_alt"; icon-source: @image-url("icons/pack/musique-alt.svg"); picked => { root.slot-pick-icon("musique_alt"); } }
+                        IconPickBtn { icon-id: "musique"; selected: root.slot-editor-icon == "musique"; icon-source: @image-url("icons/pack/music.svg"); picked => { root.slot-pick-icon("musique"); } }
+                        IconPickBtn { icon-id: "dossier"; selected: root.slot-editor-icon == "dossier"; icon-source: @image-url("icons/pack/dossier-ouvert.svg"); picked => { root.slot-pick-icon("dossier"); } }
+                        IconPickBtn { icon-id: "cloche"; selected: root.slot-editor-icon == "cloche"; icon-source: @image-url("icons/pack/cloche.svg"); picked => { root.slot-pick-icon("cloche"); } }
+                        IconPickBtn { icon-id: "crayon"; selected: root.slot-editor-icon == "crayon"; icon-source: @image-url("icons/pack/crayon.svg"); picked => { root.slot-pick-icon("crayon"); } }
+                    }
+                    HorizontalLayout { spacing: 4px;
+                        IconPickBtn { icon-id: "fleche"; selected: root.slot-editor-icon == "fleche"; icon-source: @image-url("icons/pack/fleche-petite-gauche.svg"); picked => { root.slot-pick-icon("fleche"); } }
+                        IconPickBtn { icon-id: "code8"; selected: root.slot-editor-icon == "code8"; icon-source: @image-url("icons/pack/code_8.svg"); picked => { root.slot-pick-icon("code8"); } }
+                        IconPickBtn { icon-id: "coding"; selected: root.slot-editor-icon == "coding"; icon-source: @image-url("icons/pack/coding-svgrepo-com.svg"); picked => { root.slot-pick-icon("coding"); } }
+                        IconPickBtn { icon-id: "star"; selected: root.slot-editor-icon == "star"; icon-source: @image-url("icons/pack/star.svg"); picked => { root.slot-pick-icon("star"); } }
+                        IconPickBtn { icon-id: "mic"; selected: root.slot-editor-icon == "mic"; icon-source: @image-url("icons/pack/mic.svg"); picked => { root.slot-pick-icon("mic"); } }
+                        IconPickBtn { icon-id: "bolt"; selected: root.slot-editor-icon == "bolt"; icon-source: @image-url("icons/pack/bolt.svg"); picked => { root.slot-pick-icon("bolt"); } }
+                    }
+                    HorizontalLayout { spacing: 4px;
+                        IconPickBtn { icon-id: "game"; selected: root.slot-editor-icon == "game"; icon-source: @image-url("icons/pack/game.svg"); picked => { root.slot-pick-icon("game"); } }
+                        IconPickBtn { icon-id: "cam"; selected: root.slot-editor-icon == "cam"; icon-source: @image-url("icons/pack/cam.svg"); picked => { root.slot-pick-icon("cam"); } }
+                        IconPickBtn { icon-id: "code"; selected: root.slot-editor-icon == "code"; icon-source: @image-url("icons/pack/code.svg"); picked => { root.slot-pick-icon("code"); } }
+                        IconPickBtn { icon-id: "bell"; selected: root.slot-editor-icon == "bell"; icon-source: @image-url("icons/pack/bell.svg"); picked => { root.slot-pick-icon("bell"); } }
+                        IconPickBtn { icon-id: "aide"; selected: root.slot-editor-icon == "aide"; icon-source: @image-url("icons/pack/aide.svg"); picked => { root.slot-pick-icon("aide"); } }
+                    }
+                    ActionBtn {
+                        label: @tr("No icon");
+                        bg: Theme.btn;
+                        pressed => { root.slot-pick-icon(""); }
+                    }
+                }
+                ModalFooterClose {
+                    close => { root.slot-close-icon-picker(); }
+                }
+            }
+        }
+    }
+
+    if root.show-alarm-popup: Rectangle {
+        width: 100%;
+        height: 100%;
+        background: #000000ee;
+        Rectangle {
+            width: min(320px, parent.width - 24px);
+            height: 340px;
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - self.height) / 2;
+            background: #1a1a1a;
+            border-radius: 16px;
+            border-width: 3px;
+            border-color: #ffc107;
+            VerticalLayout {
+                padding: 24px;
+                spacing: 16px;
+                alignment: center;
+                Image {
+                    source: @image-url("icons/pack/cloche.svg");
+                    width: 80px;
+                    height: 80px;
+                }
+                Text {
+                    text: @tr("ALARM");
+                    color: #ffc107;
+                    font-size: 18px;
+                    font-weight: 700;
+                    letter-spacing: 2px;
+                    horizontal-alignment: center;
+                }
+                Text {
+                    text: root.alarm-popup-time;
+                    color: Theme.accent;
+                    font-size: 32px;
+                    font-weight: 700;
+                    horizontal-alignment: center;
+                }
+                Text {
+                    text: root.alarm-popup-label;
+                    color: white;
+                    font-size: 12px;
+                    font-weight: 600;
+                    horizontal-alignment: center;
+                    wrap: word-wrap;
+                }
+                ModalFooterClose {
+                    close => { root.alarm-popup-dismiss(); }
+                }
+            }
+        }
+    }
+    }
+}

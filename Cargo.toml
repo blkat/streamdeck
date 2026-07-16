@@ -1,0 +1,42 @@
+[package]
+name = "streamdeck"
+version = "0.1.0"
+edition = "2021"
+description = "Mini StreamDeck - grille 5x3, SQLite, Slint UI"
+
+[[bin]]
+name = "sd-rs"
+path = "src/main.rs"
+
+[dependencies]
+slint = { version = "1.9", features = ["unstable-winit-030"] }
+rfd = "0.15"
+rusqlite = { version = "0.32", features = ["bundled"] }
+rodio = "0.20"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+uuid = { version = "1", features = ["v4"] }
+anyhow = "1"
+thiserror = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+image = "0.25"
+cpal = "0.15"
+chrono = { version = "0.4", features = ["serde"] }
+dirs = "6"
+hound = "3.5"
+ureq = "2.12"
+rust-embed = "8"
+
+winit = "0.30"
+
+[target.'cfg(windows)'.dependencies]
+wasapi = "0.19"
+windows-sys = { version = "0.59", features = ["Win32_Foundation", "Win32_Graphics_Dwm", "Win32_UI_WindowsAndMessaging"] }
+raw-window-handle = "0.6"
+
+[build-dependencies]
+slint-build = "1.9"
+
+[dev-dependencies]
+tempfile = "3"

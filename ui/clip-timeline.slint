@@ -1,0 +1,160 @@
+import { Theme } from "theme.slint";
+
+export component ClipTimeline inherits Rectangle {
+    in property <[float]> waveform;
+    in-out property <float> range-start: 0;
+    in-out property <float> range-end: 1;
+    in property <string> start-label: "0.0s";
+    in property <string> end-label: "0.0s";
+    callback range-start-changed(float);
+    callback range-end-changed(float);
+
+    private property <bool> drag-start: false;
+    private property <bool> drag-end: false;
+
+    width: 100%;
+    height: 72px;
+    background: transparent;
+
+    VerticalLayout {
+        width: 100%;
+        spacing: 6px;
+
+        timeline := Rectangle {
+            width: 100%;
+            height: 40px;
+            background: #141414;
+            border-radius: 6px;
+            border-width: 1px;
+            border-color: #555;
+            clip: true;
+
+            if root.waveform.length > 0: HorizontalLayout {
+                width: 100%;
+                height: 100%;
+                spacing: 1px;
+                padding: 4px;
+                for peak[idx] in root.waveform: VerticalLayout {
+                    horizontal-stretch: 1;
+                    alignment: end;
+                    Rectangle {
+                        width: 100%;
+                        height: peak < 0.08 ? 3px : (timeline.height - 6px) * peak;
+                        background: #888;
+                        border-radius: 1px;
+                    }
+                }
+            }
+
+            Rectangle {
+                x: 0;
+                y: 0;
+                width: parent.width * root.range-start;
+                height: parent.height;
+                background: #00000055;
+            }
+
+            Rectangle {
+                x: parent.width * root.range-start;
+                y: 0;
+                width: parent.width * (root.range-end - root.range-start);
+                height: parent.height;
+                background: #2ecc7130;
+            }
+
+            Rectangle {
+                x: parent.width * root.range-end;
+                y: 0;
+                width: parent.width * (1 - root.range-end);
+                height: parent.height;
+                background: #00000055;
+            }
+
+            Rectangle {
+                width: 4px;
+                height: parent.height;
+                x: (parent.width * root.range-start - 2px).max(0px);
+                background: Theme.accent;
+                border-radius: 2px;
+            }
+
+            Rectangle {
+                width: 4px;
+                height: parent.height;
+                x: (parent.width * root.range-end - 2px).max(0px);
+                background: Theme.accent;
+                border-radius: 2px;
+            }
+
+            timeline-touch := TouchArea {
+                width: 100%;
+                height: 100%;
+                pointer-event(event) => {
+                    if (event.kind == PointerEventKind.down && timeline.width > 1px) {
+                        let r = self.mouse-x / timeline.width;
+                        let grab = 12px / timeline.width;
+                        let ds = (r - root.range-start).abs();
+                        let de = (r - root.range-end).abs();
+                        if (ds <= grab || (ds <= de && de > grab)) {
+                            root.drag-start = true;
+                            root.drag-end = false;
+                            let nr = r.clamp(0, root.range-end - 0.005);
+                            root.range-start = nr;
+                            root.range-start-changed(nr);
+                        } else {
+                            root.drag-end = true;
+                            root.drag-start = false;
+                            let nr = r.clamp(root.range-start + 0.005, 1);
+                            root.range-end = nr;
+                            root.range-end-changed(nr);
+                        }
+                    }
+                    if (event.kind == PointerEventKind.up) {
+                        root.drag-start = false;
+                        root.drag-end = false;
+                    }
+                }
+                moved => {
+                    if (timeline.width <= 1px) { return; }
+                    let r = (self.mouse-x / timeline.width).clamp(0, 1);
+                    if (root.drag-start) {
+                        let nr = r.clamp(0, root.range-end - 0.005);
+                        root.range-start = nr;
+                        root.range-start-changed(nr);
+                    }
+                    if (root.drag-end) {
+                        let nr = r.clamp(root.range-start + 0.005, 1);
+                        root.range-end = nr;
+                        root.range-end-changed(nr);
+                    }
+                }
+            }
+        }
+
+        HorizontalLayout {
+            width: 100%;
+            Text {
+                text: root.start-label;
+                color: Theme.accent;
+                font-size: 9px;
+                font-weight: 700;
+                horizontal-stretch: 1;
+            }
+            Text {
+                text: root.end-label;
+                color: Theme.accent;
+                font-size: 9px;
+                font-weight: 700;
+                horizontal-alignment: right;
+                horizontal-stretch: 1;
+            }
+        }
+
+        Text {
+            text: @tr("Drag the green cursors on the timeline");
+            color: #888;
+            font-size: 8px;
+            horizontal-alignment: center;
+        }
+    }
+}

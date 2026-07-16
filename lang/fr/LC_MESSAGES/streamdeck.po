@@ -1,0 +1,338 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: fr\n"
+
+msgid "+ File"
+msgstr "+ Fichier"
+
+msgid "1) Click a sound  2) Select  3) Save in the editor"
+msgstr "1) Cliquez un son  2) Choisir  3) Sauver dans l editeur"
+
+msgid "1) Click an image  2) Select  3) Save in the editor"
+msgstr "1) Cliquez une image  2) Choisir  3) Sauver dans l editeur"
+
+msgid "ALARM"
+msgstr "ALARME"
+
+msgid "Alarm"
+msgstr "Alarme"
+
+msgid "Alarm mode"
+msgstr "Mode alarme"
+
+msgid "Allow videos longer than 5 min"
+msgstr "Autoriser les videos de plus de 5 min"
+
+msgid "Application"
+msgstr "Application"
+
+msgid "Application settings"
+msgstr "Réglages application"
+
+msgid "Apply"
+msgstr "Valider"
+
+msgid "Audio playback"
+msgstr "Lecture audio"
+
+msgid "Audio recording"
+msgstr "Enregistrement audio"
+
+msgid "Bash (e.g. /bin/bash or C:\\Program Files\\Git\\bin\\bash.exe)"
+msgstr "Bash (ex: /bin/bash ou C:\\Program Files\\Git\\bin\\bash.exe)"
+
+msgid "Black key, no icon (no action on click)"
+msgstr "Touche noire, sans icone (aucune action au clic)"
+
+msgid "Browse"
+msgstr "Parcourir"
+
+msgid "Browse an audio file — the waveform appears here with two cursors."
+msgstr "Parcourir un fichier audio — la ligne d onde apparait ici avec deux curseurs."
+
+msgid "Button appearance"
+msgstr "Apparence de la touche"
+
+msgid "Button color"
+msgstr "Couleur de la touche"
+
+msgid "Button name"
+msgstr "Nom de la touche"
+
+msgid "Button type"
+msgstr "Type de bouton"
+
+msgid "CMD (e.g. C:\\Windows\\System32\\cmd.exe)"
+msgstr "CMD (ex: C:\\Windows\\System32\\cmd.exe)"
+
+msgid "Cancel"
+msgstr "Annuler"
+
+msgid "Change"
+msgstr "Changer"
+
+msgid "Choose an icon"
+msgstr "Choisir une icône"
+
+msgid "Clear"
+msgstr "Effacer"
+
+msgid "Clock"
+msgstr "Heure"
+
+msgid "Close"
+msgstr "Fermer"
+
+msgid "Color"
+msgstr "Couleur"
+
+msgid "Color + icon"
+msgstr "Couleur + icone"
+
+msgid "Configure button"
+msgstr "Configurer le bouton"
+
+msgid "Default"
+msgstr "Defaut"
+
+msgid "Default grid: A-Z-E-R-T / Q-S-D-F-G / W-X-C-V-B (physical AZERTY positions)."
+msgstr "Defaut grille : A-Z-E-R-T / Q-S-D-F-G / W-X-C-V-B (position physique AZERTY)."
+
+msgid "Default limit: videos up to 5 min to stay responsive."
+msgstr "Limite par defaut : videos de 5 min maximum pour rester reactif."
+
+msgid "Delete"
+msgstr "Supprimer"
+
+msgid "Download URL"
+msgstr "Télécharger URL"
+
+msgid "Download in progress — please wait…"
+msgstr "Telechargement en cours — patientez…"
+
+msgid "Drag the green cursors on the timeline"
+msgstr "Glissez les curseurs verts sur la ligne"
+
+msgid "Duration: —"
+msgstr "Durée : —"
+
+msgid "Empty"
+msgstr "Vide"
+
+msgid "Enable grid shortcuts"
+msgstr "Activer raccourcis grille"
+
+msgid "File"
+msgstr "Fichier"
+
+msgid "Folder"
+msgstr "Dossier"
+
+msgid "For a folder, this name also creates the path /home/name."
+msgstr "Pour un dossier, ce nom crée aussi le chemin /accueil/nom."
+
+msgid "Icon"
+msgstr "Icône"
+
+msgid "Image"
+msgstr "Image"
+
+msgid "Image URL"
+msgstr "URL image"
+
+msgid "Image library"
+msgstr "Bibliothèque images"
+
+msgid "Images"
+msgstr "Images"
+
+msgid "Interpreter"
+msgstr "Interpréteur"
+
+msgid "Keep Streamdeck on top"
+msgstr "Garder Streamdeck au premier plan"
+
+msgid "Key: {}"
+msgstr "Touche : {}"
+
+msgid "Keyboard shortcut"
+msgstr "Raccourci clavier"
+
+msgid "Language"
+msgstr "Langue"
+
+msgid "Library"
+msgstr "Bibliothèque"
+
+msgid "Load"
+msgstr "Charger"
+
+msgid "Local trim"
+msgstr "Découpe locale"
+
+msgid "Manage your sounds — import, play, delete."
+msgstr "Gérez vos sons — importez, écoutez, supprimez."
+
+msgid "Max capture duration (seconds, e.g. 60)"
+msgstr "Durée max capture (secondes, ex. 60)"
+
+msgid "Max channels (e.g. 3)"
+msgstr "Canaux max (ex. 3)"
+
+msgid "Maximum length of a mic or PC recording. 60 = one minute max, then auto-stop."
+msgstr "Durée maximale d'un enregistrement micro ou son PC. 60 = une minute maximum, puis arrêt automatique."
+
+msgid "Maximum sounds playing at once. Used only in « limited » mode. 3 = at most three concurrent sounds."
+msgstr "Nombre maximum de sons joués en même temps. Utilisé uniquement en mode « limited ». 3 = trois sons simultanés au plus."
+
+msgid "Mic"
+msgstr "Micro"
+
+msgid "Move the green cursors, listen, then Save."
+msgstr "Deplacez les curseurs verts, ecoutez, puis Sauver."
+
+msgid "Music, games and browser audio are recorded (speaker output)."
+msgstr "Musique, jeux et sons du navigateur sont enregistrés (sortie haut-parleurs)."
+
+msgid "Name"
+msgstr "Nom"
+
+msgid "Name (e.g. Applause)"
+msgstr "Nom (ex: Applaudissements)"
+
+msgid "No icon"
+msgstr "Aucune icone"
+
+msgid "No sound selected"
+msgstr "Aucun son sélectionné"
+
+msgid "Optional — e.g. Applause, Intro"
+msgstr "Optionnel — ex. Applaudissements, Intro"
+
+msgid "Other duration in minutes (e.g. 7, 25, 90)"
+msgstr "Autre duree en minutes (ex: 7, 25, 90)"
+
+msgid "Paste a URL then Load — the waveform with two cursors appears here."
+msgstr "Collez une URL puis Charger — la ligne d onde avec deux curseurs apparait ici."
+
+msgid "Play"
+msgstr "Écouter"
+
+msgid "Play selection"
+msgstr "Ecouter selection"
+
+msgid "Policy"
+msgstr "Politique"
+
+msgid "PowerShell (e.g. C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe)"
+msgstr "PowerShell (ex: C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe)"
+
+msgid "Presets 5·10·15·30 min or custom duration below"
+msgstr "Raccourcis 5·10·15·30 min ou duree personnalisee ci-dessous"
+
+msgid "Press REC"
+msgstr "Appuyez sur REC"
+
+msgid "Press a key…"
+msgstr "Appuyez sur une touche…"
+
+msgid "Python (e.g. python, python3, C:\\Python312\\python.exe)"
+msgstr "Python (ex: python, python3, C:\\Python312\\python.exe)"
+
+msgid "Row 1: A Z E R T — Row 2: Q S D F G — Row 3: W X C V B (AZERTY positions)."
+msgstr "Ligne 1 : A Z E R T — Ligne 2 : Q S D F G — Ligne 3 : W X C V B (positions AZERTY)."
+
+msgid "Save"
+msgstr "Sauver"
+
+msgid "Script interpreters (empty = auto-detect)"
+msgstr "Interpréteurs script (vide = détection auto)"
+
+msgid "Script path (e.g. C:\\scripts\\action.ps1)"
+msgstr "Chemin du script (ex: C:\\scripts\\action.ps1)"
+
+msgid "Select"
+msgstr "Choisir"
+
+msgid "Settings"
+msgstr "Paramètres"
+
+msgid "Shared images — import here, then assign in edit mode."
+msgstr "Images partagees — importez ici, puis assignez en edition."
+
+msgid "Sound"
+msgstr "Son"
+
+msgid "Sound / music"
+msgstr "Son / musique"
+
+msgid "Sound library"
+msgstr "Bibliothèque sons"
+
+msgid "Sound name (e.g. Applause, Jingle)"
+msgstr "Nom du son (ex: Applaudissements, Jingle)"
+
+msgid "Sound name (e.g. Chorus, Intro)"
+msgstr "Nom du son (ex: Refrain, Intro)"
+
+msgid "Sounds"
+msgstr "Sons"
+
+msgid "Source"
+msgstr "Source"
+
+msgid "Source audio file"
+msgstr "Fichier audio source"
+
+msgid "Target loudness LUFS (e.g. -16)"
+msgstr "Volume cible LUFS (ex. -16)"
+
+msgid "Target loudness on import (file, URL, capture). -16 = loud (broadcast); -23 = quieter. ffmpeg normalizes to this value (ffmpeg required)."
+msgstr "Niveau sonore cible à l'import (fichier, URL, capture). -16 = fort (broadcast) ; -23 = plus doux. ffmpeg normalise vers cette valeur (ffmpeg requis)."
+
+msgid "Test"
+msgstr "Tester"
+
+msgid "The microphone records your voice or a sound near the mic."
+msgstr "Le microphone enregistre votre voix ou un son proche du micro."
+
+msgid "The script runs with the selected interpreter. Custom paths in Settings."
+msgstr "Le script est lancé avec l interpréteur choisi. Chemins personnalisés dans Réglages."
+
+msgid "Timer"
+msgstr "Minuteur"
+
+msgid "Tools"
+msgstr "Outils"
+
+msgid "Trigger time"
+msgstr "Heure de déclenchement"
+
+msgid "URL extract"
+msgstr "Extrait URL"
+
+msgid "Volume"
+msgstr "Volume"
+
+msgid "Warning: beyond 5 min, loading may take several minutes."
+msgstr "Attention : au-dela de 5 min, le chargement peut prendre plusieurs minutes."
+
+msgid "Window"
+msgstr "Fenêtre"
+
+msgid "https://... (Unsplash, direct link, …)"
+msgstr "https://... (Unsplash, lien direct, …)"
+
+msgid "https://... (YouTube, direct audio link)"
+msgstr "https://... (YouTube, lien direct audio)"
+
+msgid "stop_previous = stop current sound; overlap = layer sounds; limited = cap concurrent sounds."
+msgstr "stop_previous = arrête le son en cours ; overlap = superpose les sons ; limited = limite le nombre de sons simultanés."
+
+msgid "● Recording"
+msgstr "● En cours"
+
+msgid "✓ Done"
+msgstr "✓ Terminé"
+
